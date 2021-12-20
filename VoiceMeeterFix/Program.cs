@@ -47,7 +47,7 @@ namespace VoiceMeeterFix
                         ts.RootFolder.RegisterTaskDefinition(@"VoiceMeeterFix", td);
 
                         Console.WriteLine("[INFO]: Task Schedule Created");
-                        log.AppendLine($"[INFO]: Task Schedule Created:\n{td.Data.ToString()}");
+                        log.AppendLine($"[INFO]: Task Schedule Created");
                     }
 
                     // Change setup value to true
