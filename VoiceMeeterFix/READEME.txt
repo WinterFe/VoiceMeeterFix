@@ -1,0 +1,7 @@
+﻿DO NOT INGORE THIS FILE.
+
+Copy ALL contents from this folder, and move it into a NEW folder in DOCUMENTS called VmFix.
+CAPS MATTER!!
+
+* if this is not done, the app will warn you to do so.
+** IT WILL NOT WORK PROPERLY IF NOT DONE
