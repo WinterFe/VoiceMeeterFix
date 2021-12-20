@@ -4,6 +4,8 @@ using System.Collections.Specialized;
 using System;
 using System.Diagnostics;
 using System.Security.Principal;
+using System.Text;
+using System.IO;
 
 namespace VoiceMeeterFix
 {
@@ -11,6 +13,12 @@ namespace VoiceMeeterFix
     {
         static void Main(string[] args)
         {
+            DateTime now = DateTime.Now;
+
+            // We create a log file stuff :)
+            StringBuilder log = new StringBuilder();
+            log.AppendLine($"-------{now.ToString("F")}-------");
+
             if (IsAdmin() == false)
                 Console.WriteLine("[ERROR]: Process needs to be ran as ADMIN! >:C | Curious/Unsure? Contact Fifi#2000 for more info.\n");
 
@@ -31,9 +39,15 @@ namespace VoiceMeeterFix
                         td.Principal.LogonType = TaskLogonType.S4U;
                         td.Principal.RunLevel = TaskRunLevel.Highest;
                         td.Settings.Compatibility = TaskCompatibility.V2_3;
+                        td.Settings.RunOnlyIfNetworkAvailable = true;
+                        td.Settings.AllowDemandStart = true;
+                        td.Settings.AllowHardTerminate = true;
+                        td.Settings.RestartCount = 2;
+                        td.Settings.RestartInterval = TimeSpan.FromMinutes(2);
                         ts.RootFolder.RegisterTaskDefinition(@"VoiceMeeterFix", td);
 
                         Console.WriteLine("[INFO]: Task Schedule Created");
+                        log.AppendLine($"[INFO]: Task Schedule Created:\n{td.Data.ToString()}");
                     }
 
                     // Change setup value to true
@@ -53,23 +67,30 @@ namespace VoiceMeeterFix
                     audiodg = Process.GetProcessesByName("audiodg");
                     using (Process app = audiodg[0])
                     {
+                        System.Threading.Thread.Sleep(5000);
                         // Set the properties to audiodg
                         Process.GetProcessesByName("audiodg")[0].ProcessorAffinity = (IntPtr)1;
 
-                        //System.Threading.Thread.Sleep(15000);
-                        //Process.GetProcessesByName("voicemeeterpro")[0].ProcessorAffinity = (IntPtr)4;
+                        System.Threading.Thread.Sleep(30000); // Wait 30s, giving the app time to start up
+                        Process.GetProcessesByName("voicemeeterpro")[0].ProcessorAffinity = (IntPtr)4;
 
                         Console.WriteLine("[INFO]: Process Affinity Set!");
                         Console.WriteLine("[SUCCESS]: Finished VoiceMeeter fix! Press any key to continue...");
-                        // Console.ReadKey();
+                        log.AppendLine($"[INFO]: Process Affinities Set!\n[INFO]: Affinities: VoiceMeeter: {Process.GetProcessesByName("voicemeeterpro")[0].ProcessorAffinity} | audiodg: {Process.GetProcessesByName("audiodg")[0].ProcessorAffinity}");
+                        log.AppendLine("[SUCCESS]: Finished VoiceMeeter fix!");
+
                     }
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine($"[ERROR]: {e.Message}\n[INFO]: Questions? Contact Fifi#2000 | Press any key to continue...");
+                Console.WriteLine($"[ERROR]: {e.StackTrace}\n[INFO]: Questions? Contact Fifi#2000 | Press any key to continue...");
+                log.AppendLine($"[ERROR]: {e.StackTrace}\n[INFO]: Questions? Contact Fifi#2000");
                 Console.ReadKey();
             }
+
+            // Save the log file
+            File.AppendAllText("log.txt", log.ToString());
         }
 
         public static bool IsAdmin()
