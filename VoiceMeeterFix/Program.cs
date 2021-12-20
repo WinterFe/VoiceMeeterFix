@@ -28,6 +28,9 @@ namespace VoiceMeeterFix
                         td.RegistrationInfo.Author = "Fifi#2000";
                         td.Triggers.Add(new LogonTrigger { Enabled = true });
                         td.Actions.Add(new ExecAction($"C:\\Users\\{Environment.UserName}\\Documents\\VmFix\\VoiceMeeterFix.exe", null, null));
+                        td.Principal.LogonType = TaskLogonType.S4U;
+                        td.Principal.RunLevel = TaskRunLevel.Highest;
+                        td.Settings.Compatibility = TaskCompatibility.V2_3;
                         ts.RootFolder.RegisterTaskDefinition(@"VoiceMeeterFix", td);
 
                         Console.WriteLine("[INFO]: Task Schedule Created");
@@ -47,12 +50,9 @@ namespace VoiceMeeterFix
                     Process[] audiodg = Process.GetProcessesByName("audiodg");
 
                     // Retrieve the audiodg process (Windows starts this automatically).
-                    // However, to prevent *possible* issues, we will wait 3 seconds before we do anything :)
                     audiodg = Process.GetProcessesByName("audiodg");
                     using (Process app = audiodg[0])
                     {
-                        System.Threading.Thread.Sleep(3000);
-
                         // Set the properties to audiodg
                         Process.GetProcessesByName("audiodg")[0].ProcessorAffinity = (IntPtr)1;
 
