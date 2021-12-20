@@ -12,7 +12,7 @@ namespace VoiceMeeterFix
         static void Main(string[] args)
         {
             if (IsAdmin() == false)
-                Console.WriteLine("[ERROR]: Proces needs to be ran as ADMIN! >:C | Curious/Unsure? Contact Fifi#2000 for more info.\n");
+                Console.WriteLine("[ERROR]: Process needs to be ran as ADMIN! >:C | Curious/Unsure? Contact Fifi#2000 for more info.\n");
 
             string setup;
             setup = ConfigurationManager.AppSettings.Get("setup");
@@ -61,7 +61,7 @@ namespace VoiceMeeterFix
 
                         Console.WriteLine("[INFO]: Process Affinity Set!");
                         Console.WriteLine("[SUCCESS]: Finished VoiceMeeter fix! Press any key to continue...");
-                        Console.ReadKey();
+                        // Console.ReadKey();
                     }
                 }
             }
