@@ -36,7 +36,7 @@ namespace VoiceMeeterFix
                         td.RegistrationInfo.Author = "Fifi#2000";
                         td.Triggers.Add(new LogonTrigger { Enabled = true });
                         td.Actions.Add(new ExecAction($"C:\\Users\\{Environment.UserName}\\Documents\\VmFix\\VoiceMeeterFix.exe", null, null));
-                        td.Principal.LogonType = TaskLogonType.S4U;
+                        td.Principal.LogonType = TaskLogonType.InteractiveToken;
                         td.Principal.RunLevel = TaskRunLevel.Highest;
                         td.Settings.Compatibility = TaskCompatibility.V2_3;
                         td.Settings.RunOnlyIfNetworkAvailable = true;
