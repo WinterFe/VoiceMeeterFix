@@ -27,60 +27,59 @@ namespace VoiceMeeterFix
 
             try
             {
-                if (setup == "false")
+                using (TaskService ts = new TaskService())
                 {
-                    using (TaskService ts = new TaskService())
-                    {
-                        TaskDefinition td = ts.NewTask();
-                        td.RegistrationInfo.Description = "Runs the VoiceMeeter mic fix | Fifi#2000";
-                        td.RegistrationInfo.Author = "Fifi#2000";
-                        td.Triggers.Add(new LogonTrigger { Enabled = true });
-                        td.Actions.Add(new ExecAction($"C:\\Users\\{Environment.UserName}\\Documents\\VmFix\\VoiceMeeterFix.exe", null, null));
-                        td.Principal.LogonType = TaskLogonType.InteractiveToken;
-                        td.Principal.RunLevel = TaskRunLevel.Highest;
-                        td.Settings.Compatibility = TaskCompatibility.V2_3;
-                        td.Settings.RunOnlyIfNetworkAvailable = true;
-                        td.Settings.AllowDemandStart = true;
-                        td.Settings.AllowHardTerminate = true;
-                        td.Settings.RestartCount = 2;
-                        td.Settings.RestartInterval = TimeSpan.FromMinutes(2);
-                        ts.RootFolder.RegisterTaskDefinition(@"VoiceMeeterFix", td);
+                    TaskDefinition td = ts.NewTask();
+                    td.RegistrationInfo.Description = "Runs the VoiceMeeter mic fix | Fifi#2000";
+                    td.RegistrationInfo.Author = "Fifi#2000";
+                    td.Triggers.Add(new LogonTrigger { Enabled = true });
+                    td.Actions.Add(new ExecAction($"C:\\Users\\{Environment.UserName}\\Documents\\VmFix\\VoiceMeeterFix.exe", null, null));
+                    td.Principal.LogonType = TaskLogonType.InteractiveToken;
+                    td.Principal.RunLevel = TaskRunLevel.Highest;
+                    td.Settings.Compatibility = TaskCompatibility.V2_3;
+                    td.Settings.RunOnlyIfNetworkAvailable = true;
+                    td.Settings.AllowDemandStart = true;
+                    td.Settings.AllowHardTerminate = true;
+                    td.Settings.RestartCount = 2;
+                    td.Settings.RestartInterval = TimeSpan.FromMinutes(2);
+                    ts.RootFolder.RegisterTaskDefinition(@"VoiceMeeterFix", td, TaskCreation.CreateOrUpdate, Environment.UserName);
 
-                        Console.WriteLine("[INFO]: Task Schedule Created");
-                        log.AppendLine($"[INFO]: Task Schedule Created");
-                    }
-
-                    // Change setup value to true
-                    Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                    config.AppSettings.Settings["setup"].Value = "true";
-                    config.Save(ConfigurationSaveMode.Full, true);
-                    ConfigurationManager.RefreshSection("appSettings");
-
-                    Console.WriteLine("[SUCCESS]: Setup Finished\n[WARN]: Make sure to set the \"VoiceMeeterFix.exe\" file in Documents\\VmFix! Press any key to continue...");
-                    Console.ReadKey(); 
-                } else if (setup == "true")
-                {
-                    // Make sure the audiodg.exe process is running.
-                    Process[] audiodg = Process.GetProcessesByName("audiodg");
-
-                    // Retrieve the audiodg process (Windows starts this automatically).
-                    audiodg = Process.GetProcessesByName("audiodg");
-                    using (Process app = audiodg[0])
-                    {
-                        System.Threading.Thread.Sleep(5000);
-                        // Set the properties to audiodg
-                        Process.GetProcessesByName("audiodg")[0].ProcessorAffinity = (IntPtr)1;
-
-                        System.Threading.Thread.Sleep(30000); // Wait 30s, giving the app time to start up
-                        Process.GetProcessesByName("voicemeeterpro")[0].ProcessorAffinity = (IntPtr)4;
-
-                        Console.WriteLine("[INFO]: Process Affinity Set!");
-                        Console.WriteLine("[SUCCESS]: Finished VoiceMeeter fix! Press any key to continue...");
-                        log.AppendLine($"[INFO]: Process Affinities Set!\n[INFO]: Affinities: VoiceMeeter: {Process.GetProcessesByName("voicemeeterpro")[0].ProcessorAffinity} | audiodg: {Process.GetProcessesByName("audiodg")[0].ProcessorAffinity}");
-                        log.AppendLine("[SUCCESS]: Finished VoiceMeeter fix!");
-
-                    }
+                    Console.WriteLine("[INFO]: Task Schedule Created");
+                    log.AppendLine($"[INFO]: Task Schedule Created");
                 }
+
+                // Change setup value to true
+                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                config.AppSettings.Settings["setup"].Value = "true";
+                config.Save(ConfigurationSaveMode.Full, true);
+                ConfigurationManager.RefreshSection("appSettings");
+
+                Console.WriteLine("[SUCCESS]: Setup Finished\n[WARN]: Make sure to set the \"VoiceMeeterFix.exe\" file in Documents\\VmFix!");
+                log.AppendLine("[SUCCESS]: Setup Finished\n[WARN]: Make sure to set the \"VoiceMeeterFix.exe\" file in Documents\\VmFix!");
+                Console.WriteLine("\n[INFO]: Running the fix!");
+                log.AppendLine("\n[INFO]: Running the fix! | (Logs can be found in the \"log.txt\" file!)");
+
+                // Make sure the audiodg.exe process is running.
+                Process[] audiodg = Process.GetProcessesByName("audiodg");
+
+                // Retrieve the audiodg process (Windows starts this automatically).
+                audiodg = Process.GetProcessesByName("audiodg");
+                using (Process app = audiodg[0])
+                {
+                    System.Threading.Thread.Sleep(5000);
+                    // Set the properties to audiodg
+                    Process.GetProcessesByName("audiodg")[0].ProcessorAffinity = (IntPtr)1;
+
+                    System.Threading.Thread.Sleep(30000); // Wait 30s, giving the app time to start up
+                    Process.GetProcessesByName("voicemeeterpro")[0].ProcessorAffinity = (IntPtr)4;
+
+                    Console.WriteLine("[INFO]: Process Affinity Set!");
+                    Console.WriteLine("[SUCCESS]: Finished VoiceMeeter fix! Press any key to continue...");
+                    log.AppendLine($"[INFO]: Process Affinities Set!\n[INFO]: Affinities: VoiceMeeter: {Process.GetProcessesByName("voicemeeterpro")[0].ProcessorAffinity} | audiodg: {Process.GetProcessesByName("audiodg")[0].ProcessorAffinity}");
+                    log.AppendLine("[SUCCESS]: Finished VoiceMeeter fix!");
+
+                }
+
             }
             catch (Exception e)
             {
